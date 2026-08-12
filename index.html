@@ -252,38 +252,5 @@
     <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
         <p>© 2026 Delron Dispatch. All rights reserved. Independent Truck Dispatch Services.</p>
     </footer>
-    <script>
-  const form = document.querySelector('form');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    // Show submitting state on the button
-    const btn = form.querySelector('button[type="submit"]');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Submitting Packet...';
-    btn.disabled = true;
-
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        // Instant guaranteed redirect to your thank you page
-        window.location.href = "https://delron-dispatch.vercel.app/thank-you.html";
-      } else {
-        alert("There was an issue submitting your form. Please try again.");
-        btn.innerHTML = 'Submit Onboarding Packet';
-        btn.disabled = false;
-      }
-    } catch (error) {
-      // Direct redirect backup
-      window.location.href = "https://delron-dispatch.vercel.app/thank-you.html";
-    }
-  });
-</script>
 </body>
 </html>
