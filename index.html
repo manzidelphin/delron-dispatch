@@ -231,6 +231,8 @@
                     </div>
                 </div>
 
+                <div id="form-status" class="hidden mt-6 rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm" role="status" aria-live="polite"></div>
+
                 <button id="submit-onboarding" type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-xl text-center text-base transition shadow-lg mt-8 disabled:opacity-70 disabled:cursor-not-allowed">
                     Submit Onboarding Packet
                 </button>
@@ -245,12 +247,48 @@
     <script>
         const form = document.getElementById('carrier-onboard-form');
         const submitButton = document.getElementById('submit-onboarding');
+        const statusBox = document.getElementById('form-status');
+
+        if (!form || !submitButton) {
+            console.error('Carrier onboarding form is missing from the page.');
+        }
 
         const supabaseUrl = window.SUPABASE_URL;
         const supabaseAnonKey = window.SUPABASE_ANON_KEY;
-        const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseAnonKey) : null;
+        let supabase = null;
+
+        const setStatus = (type, message) => {
+            if (!statusBox) return;
+
+            statusBox.classList.remove('hidden', 'border-red-500/60', 'bg-red-500/10', 'text-red-200', 'border-amber-500/60', 'bg-amber-500/10', 'text-amber-200', 'border-emerald-500/60', 'bg-emerald-500/10', 'text-emerald-200');
+            statusBox.classList.add('flex', 'items-center', 'gap-2');
+
+            if (type === 'error') {
+                statusBox.classList.add('border-red-500/60', 'bg-red-500/10', 'text-red-200');
+            } else if (type === 'success') {
+                statusBox.classList.add('border-emerald-500/60', 'bg-emerald-500/10', 'text-emerald-200');
+            } else {
+                statusBox.classList.add('border-amber-500/60', 'bg-amber-500/10', 'text-amber-200');
+            }
+
+            statusBox.innerHTML = `
+                <span class="inline-flex items-center justify-center h-4 w-4">
+                    ${type === 'error' ? '<i class="fa-solid fa-circle-exclamation text-sm"></i>' : type === 'success' ? '<i class="fa-solid fa-circle-check text-sm"></i>' : '<span class="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin"></span>'}
+                </span>
+                <span>${message}</span>
+            `;
+        };
+
+        try {
+            if (window.supabase && supabaseUrl && supabaseAnonKey) {
+                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+            }
+        } catch (error) {
+            console.error('Supabase client initialization failed:', error);
+        }
 
         const setSubmitState = (isLoading) => {
+            if (!submitButton) return;
             submitButton.disabled = isLoading;
             submitButton.innerHTML = isLoading
                 ? '<span class="inline-flex items-center justify-center gap-2"><span class="h-4 w-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></span><span>Uploading documents...</span></span>'
@@ -258,35 +296,67 @@
         };
 
         const uploadDocument = async (file, label) => {
-            if (!file) {
+            if (!file || !file.name) {
                 throw new Error(`${label} is required.`);
             }
 
-            const extension = file.name.split('.').pop() || 'pdf';
-            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+            if (!supabase) {
+                throw new Error('Supabase client was not initialized. Check the project URL and anon key.');
+            }
+
+            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 120);
             const timestamp = Date.now();
-            const uniqueId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const uniqueId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
             const storagePath = `carrier-documents/${timestamp}-${uniqueId}-${safeName}`;
 
-            const { error: uploadError } = await supabase.storage.from('carrier-documents').upload(storagePath, file, {
-                cacheControl: '3600',
-                upsert: false,
-                contentType: file.type || 'application/octet-stream'
-            });
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('carrier-documents')
+                .upload(storagePath, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: file.type || 'application/octet-stream'
+                });
 
             if (uploadError) {
+                console.error(`Supabase upload failed for ${label}:`, uploadError);
                 throw new Error(`Failed to upload ${label}: ${uploadError.message}`);
             }
 
-            const { data } = supabase.storage.from('carrier-documents').getPublicUrl(storagePath);
-            return data?.publicUrl || '';
+            const { data: publicUrlData } = supabase.storage
+                .from('carrier-documents')
+                .getPublicUrl(uploadData.path);
+
+            if (!publicUrlData?.publicUrl) {
+                throw new Error(`Could not generate a public URL for ${label}.`);
+            }
+
+            return publicUrlData.publicUrl;
         };
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+            event.stopPropagation();
+
+            if (!form || !submitButton) {
+                alert('The onboarding form is unavailable. Please refresh the page and try again.');
+                return;
+            }
+
+            if (!window.supabase) {
+                console.error('Supabase CDN script did not load.');
+                setStatus('error', 'The submit form could not load Supabase. Please refresh the page and try again.');
+                return;
+            }
 
             if (!supabase || !supabaseUrl || supabaseUrl.includes('YOUR_PROJECT_REF') || !supabaseAnonKey || supabaseAnonKey.includes('YOUR_ANON_KEY')) {
-                alert('Supabase is not configured yet. Set SUPABASE_URL and SUPABASE_ANON_KEY before submitting the onboarding form.');
+                console.error('Supabase configuration check failed:', { supabaseUrl, supabaseAnonKey: !!supabaseAnonKey });
+                setStatus('error', 'Supabase is not configured yet. Set valid SUPABASE_URL and SUPABASE_ANON_KEY values before submitting.');
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                setStatus('error', 'Please complete every required field before submitting.');
                 return;
             }
 
@@ -295,7 +365,7 @@
             const missing = requiredFields.filter((field) => !String(formData.get(field) || '').trim());
 
             if (missing.length) {
-                alert('Please complete the required carrier information fields before submitting.');
+                setStatus('error', 'Please complete the required carrier information fields before submitting.');
                 return;
             }
 
@@ -303,11 +373,12 @@
             const documentFiles = documentInputNames.map((name) => ({ name, file: formData.get(name) }));
 
             if (documentFiles.some(({ file }) => !file || !file.name)) {
-                alert('Please upload the MC Authority, W-9, and Insurance Certificate before continuing.');
+                setStatus('error', 'Please upload the MC Authority, W-9, and Insurance Certificate before continuing.');
                 return;
             }
 
             setSubmitState(true);
+            setStatus('loading', 'Uploading documents and saving your carrier profile...');
 
             try {
                 const [mcAuthorityUrl, w9Url, insuranceUrl] = await Promise.all([
@@ -329,16 +400,27 @@
                     insurance_certificate_url: insuranceUrl
                 };
 
-                const { error: insertError } = await supabase.from('carriers').insert([payload]);
+                const { data, error: insertError } = await supabase
+                    .from('carriers')
+                    .insert([payload])
+                    .select();
 
                 if (insertError) {
+                    console.error('Supabase insert failed:', insertError);
                     throw new Error(insertError.message || 'Failed to save your carrier profile.');
                 }
 
-                window.location.href = '/thank-you.html';
+                console.log('Carrier inserted successfully:', data);
+                setStatus('success', 'Carrier packet submitted successfully. Redirecting to thank-you page...');
+                form.reset();
+
+                setTimeout(() => {
+                    window.location.assign('/thank-you.html');
+                }, 1200);
             } catch (error) {
                 console.error('Carrier onboarding error:', error);
-                alert(error.message || 'Something went wrong while submitting. Please try again.');
+                setStatus('error', error.message || 'Something went wrong while submitting. Please check the console and try again.');
+                alert(error.message || 'Something went wrong while submitting. Please check the console and try again.');
                 setSubmitState(false);
             }
         });
