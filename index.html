@@ -233,7 +233,7 @@
 
                 <div id="form-status" class="hidden mt-6 rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm" role="status" aria-live="polite"></div>
 
-                <button id="submit-onboarding" type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-xl text-center text-base transition shadow-lg mt-8 disabled:opacity-70 disabled:cursor-not-allowed">
+                <button id="submit-onboarding" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-xl text-center text-base transition shadow-lg mt-8 disabled:opacity-70 disabled:cursor-not-allowed">
                     Submit Onboarding Packet
                 </button>
             </form>
@@ -333,7 +333,7 @@
             return publicUrlData.publicUrl;
         };
 
-        form.addEventListener('submit', async (event) => {
+        submitButton.addEventListener('click', async (event) => {
             event.preventDefault();
             event.stopPropagation();
 
