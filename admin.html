@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delron Dispatch — Admin Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.SUPABASE_URL = 'https://jflntnlfbvhybggrmbqd.supabase.co';
+        window.SUPABASE_ANON_KEY = 'sb_publishable_t06lfWAffZc0ECuain9aeg_VI8PzVV1';
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .hide {
+            display: none !important;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 9999px;
+            padding: 0.35rem 0.7rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased">
+    <div id="login-screen" class="min-h-screen flex items-center justify-center px-4">
+        <div class="w-full max-w-md glass-panel rounded-2xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-4">
+                    <i class="fa-solid fa-lock text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-black tracking-tight text-white">Delron Dispatch</h1>
+                <p class="text-sm text-slate-400 mt-2">Dispatcher Admin Login</p>
+            </div>
+
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input id="email" type="email" required placeholder="admin@delrondispatch.com" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <input id="password" type="password" required placeholder="Enter password" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+                    </div>
+                </div>
+
+                <div id="login-status" class="hidden rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200"></div>
+
+                <button id="login-button" type="submit" class="w-full rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 text-sm transition">
+                    Sign In to Dashboard
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-screen" class="hide min-h-screen">
+        <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.25em] text-amber-400 font-semibold">Operations</p>
+                    <h1 class="text-xl md:text-2xl font-black text-white">Delron Dispatch — Admin Operations</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300">
+                        <i class="fa-solid fa-user-shield text-amber-500"></i>
+                        <span id="active-user-email">Loading...</span>
+                    </div>
+                    <button id="sign-out-button" class="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-amber-500 hover:text-amber-400 transition">
+                        <i class="fa-solid fa-right-from-bracket mr-2"></i>Sign Out
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+            <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-8">
+                <div class="glass-panel rounded-2xl p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Total Carriers</span>
+                        <i class="fa-solid fa-users text-amber-500"></i>
+                    </div>
+                    <div id="total-carriers" class="text-3xl font-black text-white">0</div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Dry Van</span>
+                        <i class="fa-solid fa-truck text-amber-500"></i>
+                    </div>
+                    <div id="dry-van-count" class="text-3xl font-black text-white">0</div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Reefer</span>
+                        <i class="fa-solid fa-snowflake text-amber-500"></i>
+                    </div>
+                    <div id="reefer-count" class="text-3xl font-black text-white">0</div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-5 shadow-lg">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Flatbed</span>
+                        <i class="fa-solid fa-trailer text-amber-500"></i>
+                    </div>
+                    <div id="flatbed-count" class="text-3xl font-black text-white">0</div>
+                </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl p-4 sm:p-5 mb-6">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div class="flex-1">
+                        <label for="search-input" class="sr-only">Search carriers</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input id="search-input" type="text" placeholder="Search by company, MC number, or equipment type" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                        <span class="status-badge bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                            <i class="fa-solid fa-circle" aria-hidden="true"></i> Live
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-left text-sm text-slate-200">
+                        <thead class="bg-slate-900/90 text-slate-300 border-b border-slate-700">
+                            <tr>
+                                <th class="px-4 py-3 font-semibold">Date</th>
+                                <th class="px-4 py-3 font-semibold">Company Name</th>
+                                <th class="px-4 py-3 font-semibold">MC / DOT</th>
+                                <th class="px-4 py-3 font-semibold">Contact / Phone</th>
+                                <th class="px-4 py-3 font-semibold">Email</th>
+                                <th class="px-4 py-3 font-semibold">Equipment</th>
+                                <th class="px-4 py-3 font-semibold">Target Rate</th>
+                                <th class="px-4 py-3 font-semibold">Preferred Lanes</th>
+                                <th class="px-4 py-3 font-semibold">Documents</th>
+                            </tr>
+                        </thead>
+                        <tbody id="carriers-table-body" class="divide-y divide-slate-800"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const loginForm = document.getElementById('login-form');
+        const loginStatus = document.getElementById('login-status');
+        const loginButton = document.getElementById('login-button');
+        const signOutButton = document.getElementById('sign-out-button');
+        const activeUserEmail = document.getElementById('active-user-email');
+        const searchInput = document.getElementById('search-input');
+        const tableBody = document.getElementById('carriers-table-body');
+
+        const totalCarriersEl = document.getElementById('total-carriers');
+        const dryVanCountEl = document.getElementById('dry-van-count');
+        const reeferCountEl = document.getElementById('reefer-count');
+        const flatbedCountEl = document.getElementById('flatbed-count');
+
+        const config = {
+            url: window.SUPABASE_URL,
+            anonKey: window.SUPABASE_ANON_KEY
+        };
+
+        const supabase = window.supabase ? window.supabase.createClient(config.url, config.anonKey) : null;
+        let allCarriers = [];
+
+        function setLoginStatus(message, isError = true) {
+            loginStatus.classList.remove('hidden');
+            loginStatus.classList.toggle('border-red-500/40', isError);
+            loginStatus.classList.toggle('bg-red-500/10', isError);
+            loginStatus.classList.toggle('text-red-200', isError);
+            loginStatus.textContent = message;
+        }
+
+        function clearLoginStatus() {
+            loginStatus.classList.add('hidden');
+            loginStatus.textContent = '';
+        }
+
+        function isAuthenticatedView() {
+            return !loginScreen.classList.contains('hide');
+        }
+
+        function showDashboard() {
+            loginScreen.classList.add('hide');
+            dashboardScreen.classList.remove('hide');
+        }
+
+        function showLogin() {
+            dashboardScreen.classList.add('hide');
+            loginScreen.classList.remove('hide');
+        }
+
+        function formatDate(value) {
+            if (!value) return '—';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function getEquipmentKey(value) {
+            if (!value) return 'other';
+            const normalized = value.toLowerCase();
+            if (normalized.includes('dry van')) return 'dry-van';
+            if (normalized.includes('reefer')) return 'reefer';
+            if (normalized.includes('flatbed')) return 'flatbed';
+            return 'other';
+        }
+
+        function renderMetrics(carriers) {
+            totalCarriersEl.textContent = carriers.length;
+            dryVanCountEl.textContent = carriers.filter((carrier) => getEquipmentKey(carrier.equipment_type) === 'dry-van').length;
+            reeferCountEl.textContent = carriers.filter((carrier) => getEquipmentKey(carrier.equipment_type) === 'reefer').length;
+            flatbedCountEl.textContent = carriers.filter((carrier) => getEquipmentKey(carrier.equipment_type) === 'flatbed').length;
+        }
+
+        function renderDocumentButtons(row) {
+            const docs = [
+                { label: 'MC Authority', url: row.mc_authority_url, icon: 'fa-file-pdf' },
+                { label: 'W-9', url: row.w9_url, icon: 'fa-file-invoice' },
+                { label: 'Insurance COI', url: row.insurance_certificate_url, icon: 'fa-shield-halved' }
+            ];
+
+            return docs.map((doc) => {
+                const isDisabled = !doc.url;
+                return `
+                    <a
+                        href="${doc.url || '#'}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-bold ${isDisabled ? 'bg-slate-800 text-slate-500 cursor-not-allowed pointer-events-none' : 'bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20'}"
+                        title="${doc.label}"
+                        aria-label="Open ${doc.label}"
+                    >
+                        <i class="fa-solid ${doc.icon}"></i>
+                        ${doc.label}
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function filterCarriers() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            if (!query) {
+                renderRows(allCarriers);
+                renderMetrics(allCarriers);
+                return;
+            }
+
+            const filtered = allCarriers.filter((carrier) => {
+                const searchable = [
+                    carrier.company_name,
+                    carrier.mc_dot_number,
+                    carrier.equipment_type,
+                    carrier.preferred_lanes,
+                    carrier.email,
+                    carrier.contact_name_phone
+                ].join(' ').toLowerCase();
+
+                return searchable.includes(query);
+            });
+
+            renderRows(filtered);
+            renderMetrics(filtered);
+        }
+
+        function renderRows(carriers) {
+            if (!carriers.length) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="px-4 py-10 text-center text-slate-400">
+                            No carrier submissions match your current search.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = carriers.map((carrier) => `
+                <tr class="bg-slate-950/20 hover:bg-slate-900/60 transition">
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-300">${formatDate(carrier.created_at)}</td>
+                    <td class="px-4 py-3 font-semibold text-white">${carrier.company_name || '—'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.mc_dot_number || '—'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.contact_name_phone || '—'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.email || '—'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.equipment_type || '—'}</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.target_rate_per_mile || '—'}</td>
+                    <td class="px-4 py-3 max-w-xs text-slate-300">${carrier.preferred_lanes || '—'}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex flex-wrap gap-2">
+                            ${renderDocumentButtons(carrier)}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function fetchCarriers() {
+            if (!supabase) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="px-4 py-10 text-center text-red-300">
+                            Supabase client is unavailable. Check the configuration.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('carriers')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="px-4 py-10 text-center text-red-300">
+                            Unable to load carrier submissions: ${error.message}
+                        </td>
+                    </tr>
+                `;
+                console.error('Failed to fetch carriers:', error);
+                return;
+            }
+
+            allCarriers = data || [];
+            renderMetrics(allCarriers);
+            renderRows(allCarriers);
+        }
+
+        async function checkSession() {
+            if (!supabase) {
+                showLogin();
+                return;
+            }
+
+            const { data, error } = await supabase.auth.getSession();
+
+            if (error) {
+                console.error('Session check failed:', error);
+                showLogin();
+                return;
+            }
+
+            if (data?.session?.user?.email) {
+                activeUserEmail.textContent = data.session.user.email;
+                showDashboard();
+                await fetchCarriers();
+            } else {
+                showLogin();
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            if (!supabase) {
+                setLoginStatus('Supabase is not configured correctly.');
+                return;
+            }
+
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                setLoginStatus('Please enter both your email and password.');
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Signing In...';
+            clearLoginStatus();
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                setLoginStatus(error.message || 'Login failed. Please try again.');
+                loginButton.disabled = false;
+                loginButton.innerHTML = 'Sign In to Dashboard';
+                return;
+            }
+
+            const userEmail = data?.user?.email || email;
+            activeUserEmail.textContent = userEmail;
+            showDashboard();
+            await fetchCarriers();
+
+            loginButton.disabled = false;
+            loginButton.innerHTML = 'Sign In to Dashboard';
+            loginForm.reset();
+        }
+
+        async function handleSignOut() {
+            if (!supabase) {
+                showLogin();
+                return;
+            }
+
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error('Sign out failed:', error);
+            }
+
+            showLogin();
+            clearLoginStatus();
+            loginForm.reset();
+            activeUserEmail.textContent = 'Loading...';
+        }
+
+        loginForm.addEventListener('submit', handleLogin);
+        signOutButton.addEventListener('click', handleSignOut);
+        searchInput.addEventListener('input', filterCarriers);
+
+        checkSession();
+    </script>
+</body>
+</html>
