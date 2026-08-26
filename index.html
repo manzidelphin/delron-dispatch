@@ -4,32 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delron Dispatch | Maximized Miles. Premier Rates.</title>
-    <!-- Tailwind CSS CDN for instant styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.SUPABASE_URL = window.SUPABASE_URL || 'https://jflntnlfbvhybggrmbqd.supabase.co';
+        window.SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY ||  'sb_publishable_t06lfWAfFzC0ECuain9aeg_VI8PzVV1';
+    </script>
 </head>
 <body class="bg-slate-900 text-gray-100 font-sans antialiased">
 
-    <!-- NAVIGATION -->
     <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur fixed w-full z-50 top-0">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-2xl font-black tracking-wider text-amber-500">DELRON</span>
-                <span class="text-xs font-semibold px-2 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded">DISPATCH</span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 min-w-0">
+                <span class="text-xl sm:text-2xl font-black tracking-wider text-amber-500 whitespace-nowrap">DELRON</span>
+                <span class="hidden xs:inline text-[10px] sm:text-xs font-semibold px-2 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded whitespace-nowrap">DISPATCH</span>
             </div>
+
             <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-300">
                 <a href="#services" class="hover:text-amber-400 transition">Services</a>
                 <a href="#why-us" class="hover:text-amber-400 transition">Why Us</a>
                 <a href="#onboard" class="hover:text-amber-400 transition">Carrier Setup</a>
             </div>
-            <a href="tel:+10000000000" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-lg text-sm transition">
-                <i class="fa-solid fa-phone mr-2"></i>(555) 000-0000
+
+            <a href="tel:+15550000000" class="inline-flex items-center justify-center bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition focus:outline-none focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-slate-900 h-11 w-11 sm:h-auto sm:w-auto sm:px-5 sm:py-2.5 min-h-[44px] min-w-[44px]">
+                <i class="fa-solid fa-phone text-base"></i>
+                <span class="hidden sm:inline sm:ml-2 text-sm">(555) 000-0000</span>
             </a>
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
     <section class="pt-36 pb-20 px-6 max-w-7xl mx-auto text-center md:text-left grid md:grid-cols-2 gap-12 items-center">
         <div>
             <div class="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-amber-400 text-xs font-semibold uppercase tracking-wider mb-6">
@@ -61,7 +65,6 @@
         </div>
     </section>
 
-    <!-- EQUIPMENT COVERED -->
     <section id="services" class="py-16 bg-slate-950 border-y border-slate-800">
         <div class="max-w-7xl mx-auto px-6">
             <h2 class="text-3xl font-extrabold text-center text-white mb-12">Equipment Types We Handle</h2>
@@ -84,8 +87,8 @@
             </div>
         </div>
     </section>
-    <!-- HOW IT WORKS SECTION -->
-    <section class="py-20 max-w-7xl mx-auto px-6">
+
+    <section id="why-us" class="py-20 max-w-7xl mx-auto px-6">
         <h2 class="text-3xl font-extrabold text-center text-white mb-4">How It Works</h2>
         <p class="text-slate-400 text-center max-w-2xl mx-auto mb-16 text-sm">Getting on the road with Delron Dispatch takes less than 15 minutes.</p>
 
@@ -113,7 +116,6 @@
         </div>
     </section>
 
-    <!-- PRICING SECTION -->
     <section class="py-16 bg-slate-950 border-y border-slate-800">
         <div class="max-w-4xl mx-auto px-6 text-center">
             <h2 class="text-3xl font-extrabold text-white mb-4">Transparent Pricing</h2>
@@ -135,7 +137,6 @@
         </div>
     </section>
 
-    <!-- TESTIMONIALS (DRIVER SOCIAL PROOF) -->
     <section class="py-20 max-w-7xl mx-auto px-6">
         <h2 class="text-3xl font-extrabold text-center text-white mb-12">What Our Drivers Say</h2>
         <div class="grid md:grid-cols-2 gap-8">
@@ -156,52 +157,42 @@
         </div>
     </section>
 
-<!-- CARRIER ONBOARDING FORM -->
     <section id="onboard" class="py-20 max-w-4xl mx-auto px-6">
         <div class="bg-slate-800 border border-slate-700 p-8 md:p-10 rounded-2xl shadow-xl">
             <h2 class="text-2xl md:text-3xl font-extrabold text-white text-center mb-2">Carrier Onboarding</h2>
             <p class="text-slate-400 text-center mb-8 text-sm">Fill out your details and load preferences below to start dispatching with Delron Dispatch.</p>
-            
-         <form action="https://formsubmit.co/manzidelphin2@gmail.com" method="POST" enctype="multipart/form-data" class="space-y-6">
-    
-    <!-- Hidden Configuration Fields -->
-    <input type="hidden" name="_next" value="https://delron-dispatch.vercel.app/thank-you.html">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="_subject" value="New Carrier Packet Submission - Delron Dispatch">
-    <input type="hidden" name="_autoresponse" value="Thank you for submitting your carrier packet to Delron Dispatch! We have received your documents and driving preferences. A dedicated dispatcher will review your MC authority and reach out to you within 15 to 30 minutes to discuss available high-paying loads.">
 
-                <!-- STEP 1: COMPANY INFO -->
+            <form id="carrier-onboard-form" class="space-y-6" novalidate>
                 <div class="border-b border-slate-700 pb-6">
                     <h3 class="text-amber-500 font-bold text-xs uppercase tracking-wider mb-4"><i class="fa-solid fa-id-card mr-2"></i>1. Carrier Information</h3>
                     <div class="grid md:grid-cols-2 gap-6 mb-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Company Name</label>
-                            <input type="text" name="Company_Name" required placeholder="e.g. Blue Sky Logistics LLC" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <input type="text" name="company_name" required placeholder="e.g. Blue Sky Logistics LLC" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500" />
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">MC / DOT Number</label>
-                            <input type="text" name="MC_or_DOT_Number" required placeholder="e.g. MC-123456" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <input type="text" name="mc_dot_number" required placeholder="e.g. MC-123456" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500" />
                         </div>
                     </div>
                     <div class="grid md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Contact Name & Phone</label>
-                            <input type="tel" name="Contact_Phone" required placeholder="(555) 000-0000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <input type="text" name="contact_name_phone" required placeholder="e.g. Alex Morgan - (555) 000-0000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500" />
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Email Address</label>
-                        <input type="email" name="email" required placeholder="driver@company.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <input type="email" name="email" required placeholder="driver@company.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500" />
                         </div>
                     </div>
                 </div>
 
-                <!-- STEP 2: PREFERENCES & EQUIPMENT -->
                 <div class="border-b border-slate-700 pb-6">
                     <h3 class="text-amber-500 font-bold text-xs uppercase tracking-wider mb-4"><i class="fa-solid fa-sliders mr-2"></i>2. Equipment & Driving Preferences</h3>
                     <div class="grid md:grid-cols-3 gap-6 mb-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Equipment Type</label>
-                            <select name="Equipment_Type" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <select name="equipment_type" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
                                 <option>Dry Van (53ft)</option>
                                 <option>Reefer</option>
                                 <option>Flatbed / Stepdeck</option>
@@ -210,47 +201,147 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Preferred Driving Lanes/States</label>
-                            <input type="text" name="Preferred_Lanes" placeholder="e.g. Texas to Midwest, OTR" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <input type="text" name="preferred_lanes" placeholder="e.g. Texas to Midwest, OTR" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500" />
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase mb-2">Target Rate / Mile ($)</label>
-                            <input type="text" name="Target_Rate_Per_Mile" placeholder="e.g. $2.50 / mile min" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500">
+                            <input type="text" name="target_rate_per_mile" placeholder="e.g. $2.50 / mile min" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-500" />
                         </div>
                     </div>
                 </div>
 
-                <!-- STEP 3: DOCUMENT UPLOAD -->
                 <div>
                     <h3 class="text-amber-500 font-bold text-xs uppercase tracking-wider mb-4"><i class="fa-solid fa-file-arrow-up mr-2"></i>3. Upload Carrier Documents</h3>
                     <div class="grid md:grid-cols-3 gap-4">
                         <div class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-4 text-center">
                             <i class="fa-solid fa-file-pdf text-amber-500 text-xl mb-2"></i>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">MC Authority Letter</label>
-                            <input type="file" name="MC_Authority_Doc" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400">
+                            <input type="file" name="mc_authority_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
                         </div>
                         <div class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-4 text-center">
                             <i class="fa-solid fa-file-invoice text-amber-500 text-xl mb-2"></i>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">W-9 Form</label>
-                            <input type="file" name="W9_Form_Doc" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400">
+                            <input type="file" name="w9_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
                         </div>
                         <div class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-4 text-center">
                             <i class="fa-solid fa-shield-halved text-amber-500 text-xl mb-2"></i>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Certificate of Insurance</label>
-                            <input type="file" name="Insurance_Cert_Doc" class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400">
+                            <input type="file" name="insurance_certificate_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-xl text-center text-base transition shadow-lg mt-8">
+                <button id="submit-onboarding" type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-xl text-center text-base transition shadow-lg mt-8 disabled:opacity-70 disabled:cursor-not-allowed">
                     Submit Onboarding Packet
                 </button>
             </form>
         </div>
     </section>
 
-    <!-- FOOTER -->
     <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
         <p>© 2026 Delron Dispatch. All rights reserved. Independent Truck Dispatch Services.</p>
     </footer>
+
+    <script>
+        const form = document.getElementById('carrier-onboard-form');
+        const submitButton = document.getElementById('submit-onboarding');
+
+        const supabaseUrl = window.SUPABASE_URL;
+        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+        const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseAnonKey) : null;
+
+        const setSubmitState = (isLoading) => {
+            submitButton.disabled = isLoading;
+            submitButton.innerHTML = isLoading
+                ? '<span class="inline-flex items-center justify-center gap-2"><span class="h-4 w-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></span><span>Uploading documents...</span></span>'
+                : 'Submit Onboarding Packet';
+        };
+
+        const uploadDocument = async (file, label) => {
+            if (!file) {
+                throw new Error(`${label} is required.`);
+            }
+
+            const extension = file.name.split('.').pop() || 'pdf';
+            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+            const timestamp = Date.now();
+            const uniqueId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const storagePath = `carrier-documents/${timestamp}-${uniqueId}-${safeName}`;
+
+            const { error: uploadError } = await supabase.storage.from('carrier-documents').upload(storagePath, file, {
+                cacheControl: '3600',
+                upsert: false,
+                contentType: file.type || 'application/octet-stream'
+            });
+
+            if (uploadError) {
+                throw new Error(`Failed to upload ${label}: ${uploadError.message}`);
+            }
+
+            const { data } = supabase.storage.from('carrier-documents').getPublicUrl(storagePath);
+            return data?.publicUrl || '';
+        };
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!supabase || !supabaseUrl || supabaseUrl.includes('YOUR_PROJECT_REF') || !supabaseAnonKey || supabaseAnonKey.includes('YOUR_ANON_KEY')) {
+                alert('Supabase is not configured yet. Set SUPABASE_URL and SUPABASE_ANON_KEY before submitting the onboarding form.');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const requiredFields = ['company_name', 'mc_dot_number', 'contact_name_phone', 'email'];
+            const missing = requiredFields.filter((field) => !String(formData.get(field) || '').trim());
+
+            if (missing.length) {
+                alert('Please complete the required carrier information fields before submitting.');
+                return;
+            }
+
+            const documentInputNames = ['mc_authority_file', 'w9_file', 'insurance_certificate_file'];
+            const documentFiles = documentInputNames.map((name) => ({ name, file: formData.get(name) }));
+
+            if (documentFiles.some(({ file }) => !file || !file.name)) {
+                alert('Please upload the MC Authority, W-9, and Insurance Certificate before continuing.');
+                return;
+            }
+
+            setSubmitState(true);
+
+            try {
+                const [mcAuthorityUrl, w9Url, insuranceUrl] = await Promise.all([
+                    uploadDocument(documentFiles[0].file, 'MC Authority'),
+                    uploadDocument(documentFiles[1].file, 'W-9'),
+                    uploadDocument(documentFiles[2].file, 'Insurance Certificate')
+                ]);
+
+                const payload = {
+                    company_name: String(formData.get('company_name') || '').trim(),
+                    mc_dot_number: String(formData.get('mc_dot_number') || '').trim(),
+                    contact_name_phone: String(formData.get('contact_name_phone') || '').trim(),
+                    email: String(formData.get('email') || '').trim(),
+                    equipment_type: String(formData.get('equipment_type') || '').trim(),
+                    preferred_lanes: String(formData.get('preferred_lanes') || '').trim(),
+                    target_rate_per_mile: String(formData.get('target_rate_per_mile') || '').trim(),
+                    mc_authority_url: mcAuthorityUrl,
+                    w9_url: w9Url,
+                    insurance_certificate_url: insuranceUrl
+                };
+
+                const { error: insertError } = await supabase.from('carriers').insert([payload]);
+
+                if (insertError) {
+                    throw new Error(insertError.message || 'Failed to save your carrier profile.');
+                }
+
+                window.location.href = '/thank-you.html';
+            } catch (error) {
+                console.error('Carrier onboarding error:', error);
+                alert(error.message || 'Something went wrong while submitting. Please try again.');
+                setSubmitState(false);
+            }
+        });
+    </script>
 </body>
 </html>
