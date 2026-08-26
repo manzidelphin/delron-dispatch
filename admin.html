@@ -9,7 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         window.SUPABASE_URL = 'https://jflntnlfbvhybggrmbqd.supabase.co';
-        window.SUPABASE_ANON_KEY = 'sb_publishable_t06lfWAffZc0ECuain9aeg_VI8PzVV1';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmbG50bmxmYnZoeWJnZ3JtYnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NzA5NjUsImV4cCI6MjEwMzM0Njk2NX0.ZIMOGiusG9OEO3yyJuTCnWTfYAxzgsykeT0hS11CYDg';
+        window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
     </script>
     <style>
         .glass-panel {
@@ -187,7 +188,7 @@
             const reeferCountEl = document.getElementById('reefer-count');
             const flatbedCountEl = document.getElementById('flatbed-count');
 
-            const supabase = window.supabase ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
+            const supabase = window.supabase ? window.supabase.createClient(window.SUPABASE_URL, SUPABASE_ANON_KEY) : null;
             let allCarriers = [];
 
             function setLoginStatus(message, isError = true) {
