@@ -162,7 +162,7 @@
             <h2 class="text-2xl md:text-3xl font-extrabold text-white text-center mb-2">Carrier Onboarding</h2>
             <p class="text-slate-400 text-center mb-8 text-sm">Fill out your details and load preferences below to start dispatching with Delron Dispatch.</p>
 
-            <form id="carrier-onboard-form" class="space-y-6" novalidate>
+            <form id="carrier-onboard-form" class="space-y-6" novalidate onsubmit="event.preventDefault(); return false;">
                 <div class="border-b border-slate-700 pb-6">
                     <h3 class="text-amber-500 font-bold text-xs uppercase tracking-wider mb-4"><i class="fa-solid fa-id-card mr-2"></i>1. Carrier Information</h3>
                     <div class="grid md:grid-cols-2 gap-6 mb-4">
@@ -216,17 +216,17 @@
                         <div class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-4 text-center">
                             <i class="fa-solid fa-file-pdf text-amber-500 text-xl mb-2"></i>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">MC Authority Letter</label>
-                            <input type="file" name="mc_authority_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
+                            <input id="mc-authority-input" type="file" name="mc_authority_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
                         </div>
                         <div class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-4 text-center">
                             <i class="fa-solid fa-file-invoice text-amber-500 text-xl mb-2"></i>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">W-9 Form</label>
-                            <input type="file" name="w9_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
+                            <input id="w9-input" type="file" name="w9_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
                         </div>
                         <div class="bg-slate-900 border border-dashed border-slate-700 rounded-lg p-4 text-center">
                             <i class="fa-solid fa-shield-halved text-amber-500 text-xl mb-2"></i>
                             <label class="block text-xs font-semibold text-slate-300 mb-1">Certificate of Insurance</label>
-                            <input type="file" name="insurance_certificate_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
+                            <input id="insurance-input" type="file" name="insurance_certificate_file" required class="text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-800 file:text-amber-400" />
                         </div>
                     </div>
                 </div>
@@ -245,184 +245,172 @@
     </footer>
 
     <script>
-        const form = document.getElementById('carrier-onboard-form');
-        const submitButton = document.getElementById('submit-onboarding');
-        const statusBox = document.getElementById('form-status');
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('carrier-onboard-form');
+            const submitButton = document.getElementById('submit-onboarding');
+            const statusBox = document.getElementById('form-status');
 
-        if (!form || !submitButton) {
-            console.error('Carrier onboarding form is missing from the page.');
-        }
-
-        const supabaseUrl = window.SUPABASE_URL;
-        const supabaseAnonKey = window.SUPABASE_ANON_KEY;
-        let supabase = null;
-
-        const setStatus = (type, message) => {
-            if (!statusBox) return;
-
-            statusBox.classList.remove('hidden', 'border-red-500/60', 'bg-red-500/10', 'text-red-200', 'border-amber-500/60', 'bg-amber-500/10', 'text-amber-200', 'border-emerald-500/60', 'bg-emerald-500/10', 'text-emerald-200');
-            statusBox.classList.add('flex', 'items-center', 'gap-2');
-
-            if (type === 'error') {
-                statusBox.classList.add('border-red-500/60', 'bg-red-500/10', 'text-red-200');
-            } else if (type === 'success') {
-                statusBox.classList.add('border-emerald-500/60', 'bg-emerald-500/10', 'text-emerald-200');
-            } else {
-                statusBox.classList.add('border-amber-500/60', 'bg-amber-500/10', 'text-amber-200');
-            }
-
-            statusBox.innerHTML = `
-                <span class="inline-flex items-center justify-center h-4 w-4">
-                    ${type === 'error' ? '<i class="fa-solid fa-circle-exclamation text-sm"></i>' : type === 'success' ? '<i class="fa-solid fa-circle-check text-sm"></i>' : '<span class="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin"></span>'}
-                </span>
-                <span>${message}</span>
-            `;
-        };
-
-        try {
-            if (window.supabase && supabaseUrl && supabaseAnonKey) {
-                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-            }
-        } catch (error) {
-            console.error('Supabase client initialization failed:', error);
-        }
-
-        const setSubmitState = (isLoading) => {
-            if (!submitButton) return;
-            submitButton.disabled = isLoading;
-            submitButton.innerHTML = isLoading
-                ? '<span class="inline-flex items-center justify-center gap-2"><span class="h-4 w-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></span><span>Uploading documents...</span></span>'
-                : 'Submit Onboarding Packet';
-        };
-
-        const uploadDocument = async (file, label) => {
-            if (!file || !file.name) {
-                throw new Error(`${label} is required.`);
-            }
-
-            if (!supabase) {
-                throw new Error('Supabase client was not initialized. Check the project URL and anon key.');
-            }
-
-            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 120);
-            const timestamp = Date.now();
-            const uniqueId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-            const storagePath = `carrier-documents/${timestamp}-${uniqueId}-${safeName}`;
-
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('carrier-documents')
-                .upload(storagePath, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                    contentType: file.type || 'application/octet-stream'
-                });
-
-            if (uploadError) {
-                console.error(`Supabase upload failed for ${label}:`, uploadError);
-                throw new Error(`Failed to upload ${label}: ${uploadError.message}`);
-            }
-
-            const { data: publicUrlData } = supabase.storage
-                .from('carrier-documents')
-                .getPublicUrl(uploadData.path);
-
-            if (!publicUrlData?.publicUrl) {
-                throw new Error(`Could not generate a public URL for ${label}.`);
-            }
-
-            return publicUrlData.publicUrl;
-        };
-
-        submitButton.addEventListener('click', async (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            if (!form || !submitButton) {
-                alert('The onboarding form is unavailable. Please refresh the page and try again.');
+            if (!form || !submitButton || !statusBox) {
+                console.error('Carrier onboarding form elements are missing from the page.');
                 return;
             }
 
-            if (!window.supabase) {
-                console.error('Supabase CDN script did not load.');
-                setStatus('error', 'The submit form could not load Supabase. Please refresh the page and try again.');
-                return;
-            }
+            const supabaseUrl = window.SUPABASE_URL;
+            const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+            const supabaseClient = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseAnonKey) : null;
 
-            if (!supabase || !supabaseUrl || supabaseUrl.includes('YOUR_PROJECT_REF') || !supabaseAnonKey || supabaseAnonKey.includes('YOUR_ANON_KEY')) {
-                console.error('Supabase configuration check failed:', { supabaseUrl, supabaseAnonKey: !!supabaseAnonKey });
-                setStatus('error', 'Supabase is not configured yet. Set valid SUPABASE_URL and SUPABASE_ANON_KEY values before submitting.');
-                return;
-            }
+            const setStatus = (type, message) => {
+                statusBox.classList.remove('hidden', 'border-red-500/60', 'bg-red-500/10', 'text-red-200', 'border-amber-500/60', 'bg-amber-500/10', 'text-amber-200', 'border-emerald-500/60', 'bg-emerald-500/10', 'text-emerald-200');
+                statusBox.classList.add('flex', 'items-center', 'gap-2');
 
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                setStatus('error', 'Please complete every required field before submitting.');
-                return;
-            }
-
-            const formData = new FormData(form);
-            const requiredFields = ['company_name', 'mc_dot_number', 'contact_name_phone', 'email'];
-            const missing = requiredFields.filter((field) => !String(formData.get(field) || '').trim());
-
-            if (missing.length) {
-                setStatus('error', 'Please complete the required carrier information fields before submitting.');
-                return;
-            }
-
-            const documentInputNames = ['mc_authority_file', 'w9_file', 'insurance_certificate_file'];
-            const documentFiles = documentInputNames.map((name) => ({ name, file: formData.get(name) }));
-
-            if (documentFiles.some(({ file }) => !file || !file.name)) {
-                setStatus('error', 'Please upload the MC Authority, W-9, and Insurance Certificate before continuing.');
-                return;
-            }
-
-            setSubmitState(true);
-            setStatus('loading', 'Uploading documents and saving your carrier profile...');
-
-            try {
-                const [mcAuthorityUrl, w9Url, insuranceUrl] = await Promise.all([
-                    uploadDocument(documentFiles[0].file, 'MC Authority'),
-                    uploadDocument(documentFiles[1].file, 'W-9'),
-                    uploadDocument(documentFiles[2].file, 'Insurance Certificate')
-                ]);
-
-                const payload = {
-                    company_name: String(formData.get('company_name') || '').trim(),
-                    mc_dot_number: String(formData.get('mc_dot_number') || '').trim(),
-                    contact_name_phone: String(formData.get('contact_name_phone') || '').trim(),
-                    email: String(formData.get('email') || '').trim(),
-                    equipment_type: String(formData.get('equipment_type') || '').trim(),
-                    preferred_lanes: String(formData.get('preferred_lanes') || '').trim(),
-                    target_rate_per_mile: String(formData.get('target_rate_per_mile') || '').trim(),
-                    mc_authority_url: mcAuthorityUrl,
-                    w9_url: w9Url,
-                    insurance_certificate_url: insuranceUrl
-                };
-
-                const { data, error: insertError } = await supabase
-                    .from('carriers')
-                    .insert([payload])
-                    .select();
-
-                if (insertError) {
-                    console.error('Supabase insert failed:', insertError);
-                    throw new Error(insertError.message || 'Failed to save your carrier profile.');
+                if (type === 'error') {
+                    statusBox.classList.add('border-red-500/60', 'bg-red-500/10', 'text-red-200');
+                } else if (type === 'success') {
+                    statusBox.classList.add('border-emerald-500/60', 'bg-emerald-500/10', 'text-emerald-200');
+                } else {
+                    statusBox.classList.add('border-amber-500/60', 'bg-amber-500/10', 'text-amber-200');
                 }
 
-                console.log('Carrier inserted successfully:', data);
-                setStatus('success', 'Carrier packet submitted successfully. Redirecting to thank-you page...');
-                form.reset();
+                statusBox.innerHTML = `
+                    <span class="inline-flex items-center justify-center h-4 w-4">
+                        ${type === 'error' ? '<i class="fa-solid fa-circle-exclamation text-sm"></i>' : type === 'success' ? '<i class="fa-solid fa-circle-check text-sm"></i>' : '<span class="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin"></span>'}
+                    </span>
+                    <span>${message}</span>
+                `;
+            };
 
-                setTimeout(() => {
-                    window.location.assign('/thank-you.html');
-                }, 1200);
-            } catch (error) {
-                console.error('Carrier onboarding error:', error);
-                setStatus('error', error.message || 'Something went wrong while submitting. Please check the console and try again.');
-                alert(error.message || 'Something went wrong while submitting. Please check the console and try again.');
-                setSubmitState(false);
-            }
+            const setSubmitState = (isLoading) => {
+                submitButton.disabled = isLoading;
+                submitButton.innerHTML = isLoading
+                    ? '<span class="inline-flex items-center justify-center gap-2"><span class="h-4 w-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin"></span><span>Uploading documents...</span></span>'
+                    : 'Submit Onboarding Packet';
+            };
+
+            const uploadDocument = async (file, label) => {
+                if (!file || !file.name) {
+                    throw new Error(`${label} is required.`);
+                }
+
+                if (!supabaseClient) {
+                    throw new Error('Supabase client was not initialized. Check the project URL and anon key.');
+                }
+
+                const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 120);
+                const timestamp = Date.now();
+                const uniqueId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                const storagePath = `carrier-documents/${timestamp}-${uniqueId}-${safeName}`;
+
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from('carrier-documents')
+                    .upload(storagePath, file, {
+                        cacheControl: '3600',
+                        upsert: false,
+                        contentType: file.type || 'application/octet-stream'
+                    });
+
+                if (uploadError) {
+                    console.error(`Supabase upload failed for ${label}:`, uploadError);
+                    throw new Error(`Failed to upload ${label}: ${uploadError.message}`);
+                }
+
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('carrier-documents')
+                    .getPublicUrl(uploadData.path);
+
+                if (!publicUrlData?.publicUrl) {
+                    throw new Error(`Could not generate a public URL for ${label}.`);
+                }
+
+                return publicUrlData.publicUrl;
+            };
+
+            submitButton.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (!window.supabase) {
+                    console.error('Supabase CDN script did not load.');
+                    setStatus('error', 'The submit form could not load Supabase. Please refresh the page and try again.');
+                    return;
+                }
+
+                if (!supabaseClient || !supabaseUrl || supabaseUrl.includes('YOUR_PROJECT_REF') || !supabaseAnonKey || supabaseAnonKey.includes('YOUR_ANON_KEY')) {
+                    console.error('Supabase configuration check failed:', { supabaseUrl, supabaseAnonKey: !!supabaseAnonKey });
+                    setStatus('error', 'Supabase is not configured yet. Set valid SUPABASE_URL and SUPABASE_ANON_KEY values before submitting.');
+                    return;
+                }
+
+                const mcAuthorityFile = document.querySelector('input[name="mc_authority_file"]')?.files[0];
+                const w9File = document.querySelector('input[name="w9_file"]')?.files[0];
+                const insuranceFile = document.querySelector('input[name="insurance_certificate_file"]')?.files[0];
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    setStatus('error', 'Please complete every required field before submitting.');
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const requiredFields = ['company_name', 'mc_dot_number', 'contact_name_phone', 'email'];
+                const missing = requiredFields.filter((field) => !String(formData.get(field) || '').trim());
+
+                if (missing.length) {
+                    setStatus('error', 'Please complete the required carrier information fields before submitting.');
+                    return;
+                }
+
+                if (!mcAuthorityFile || !w9File || !insuranceFile) {
+                    setStatus('error', 'Please upload the MC Authority, W-9, and Insurance Certificate before continuing.');
+                    return;
+                }
+
+                setSubmitState(true);
+                setStatus('loading', 'Uploading documents and saving your carrier profile...');
+
+                try {
+                    const [mcAuthorityUrl, w9Url, insuranceUrl] = await Promise.all([
+                        uploadDocument(mcAuthorityFile, 'MC Authority'),
+                        uploadDocument(w9File, 'W-9'),
+                        uploadDocument(insuranceFile, 'Insurance Certificate')
+                    ]);
+
+                    const payload = {
+                        company_name: String(formData.get('company_name') || '').trim(),
+                        mc_dot_number: String(formData.get('mc_dot_number') || '').trim(),
+                        contact_name_phone: String(formData.get('contact_name_phone') || '').trim(),
+                        email: String(formData.get('email') || '').trim(),
+                        equipment_type: String(formData.get('equipment_type') || '').trim(),
+                        preferred_lanes: String(formData.get('preferred_lanes') || '').trim(),
+                        target_rate_per_mile: String(formData.get('target_rate_per_mile') || '').trim(),
+                        mc_authority_url: mcAuthorityUrl,
+                        w9_url: w9Url,
+                        insurance_certificate_url: insuranceUrl
+                    };
+
+                    const { data, error: insertError } = await supabaseClient
+                        .from('carriers')
+                        .insert([payload])
+                        .select();
+
+                    if (insertError) {
+                        console.error('Supabase insert failed:', insertError);
+                        throw new Error(insertError.message || 'Failed to save your carrier profile.');
+                    }
+
+                    console.log('Carrier inserted successfully:', data);
+                    setStatus('success', 'Carrier packet submitted successfully. Redirecting to thank-you page...');
+                    form.reset();
+
+                    setTimeout(() => {
+                        window.location.assign('/thank-you.html');
+                    }, 1200);
+                } catch (error) {
+                    console.error('Carrier onboarding error:', error);
+                    setStatus('error', error.message || 'Something went wrong while submitting. Please check the console and try again.');
+                    alert(error.message || 'Something went wrong while submitting. Please check the console and try again.');
+                    setSubmitState(false);
+                }
+            });
         });
     </script>
 </body>
