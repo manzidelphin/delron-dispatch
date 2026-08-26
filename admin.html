@@ -207,6 +207,16 @@
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             }
 
+            function escapeHtml(value) {
+                const safeValue = String(value ?? '');
+                return safeValue
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
             function setLoginError(message) {
                 if (!loginErrorMessage) return;
                 loginErrorMessage.textContent = message || '';
@@ -250,13 +260,13 @@
                     renderMetrics(carriers);
 
                     tableBody.innerHTML = carriers.map((c) => {
-                        const companyName = c.company_name || 'N/A';
-                        const mcDot = c.mc_dot_number || 'N/A';
-                        const contact = c.contact_name_phone || 'N/A';
-                        const email = c.email || 'N/A';
-                        const equipment = c.equipment_type || 'N/A';
-                        const targetRate = c.target_rate_per_mile || 'N/A';
-                        const preferredLanes = c.preferred_lanes || 'N/A';
+                        const companyName = escapeHtml(c.company_name || 'N/A');
+                        const mcDot = escapeHtml(c.mc_dot_number || 'N/A');
+                        const contact = escapeHtml(c.contact_name_phone || 'N/A');
+                        const email = escapeHtml(c.email || 'N/A');
+                        const equipment = escapeHtml(c.equipment_type || 'N/A');
+                        const targetRate = escapeHtml(c.target_rate_per_mile || 'N/A');
+                        const preferredLanes = escapeHtml(c.preferred_lanes || 'N/A');
 
                         const docs = [
                             { label: 'MC Authority', url: c.mc_authority_url, icon: 'fa-file-pdf' },
@@ -325,6 +335,14 @@
 
                     renderMetrics(filtered);
                     tableBody.innerHTML = filtered.map((c) => {
+                        const companyName = escapeHtml(c.company_name || 'N/A');
+                        const mcDot = escapeHtml(c.mc_dot_number || 'N/A');
+                        const contact = escapeHtml(c.contact_name_phone || 'N/A');
+                        const email = escapeHtml(c.email || 'N/A');
+                        const equipment = escapeHtml(c.equipment_type || 'N/A');
+                        const targetRate = escapeHtml(c.target_rate_per_mile || 'N/A');
+                        const preferredLanes = escapeHtml(c.preferred_lanes || 'N/A');
+
                         const docs = [
                             { label: 'MC Authority', url: c.mc_authority_url, icon: 'fa-file-pdf' },
                             { label: 'W-9', url: c.w9_url, icon: 'fa-file-invoice' },
@@ -341,13 +359,13 @@
                         return `
                             <tr class="border-b border-slate-800">
                                 <td class="px-4 py-3 whitespace-nowrap text-slate-300">${formatDate(c.created_at)}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-white font-semibold">${c.company_name || 'N/A'}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.mc_dot_number || 'N/A'}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.contact_name_phone || 'N/A'}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.email || 'N/A'}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.equipment_type || 'N/A'}</td>
-                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.target_rate_per_mile || 'N/A'}</td>
-                                <td class="px-4 py-3 max-w-xs text-slate-300">${c.preferred_lanes || 'N/A'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-white font-semibold">${companyName}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${mcDot}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${contact}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${email}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${equipment}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${targetRate}</td>
+                                <td class="px-4 py-3 max-w-xs text-slate-300">${preferredLanes}</td>
                                 <td class="px-4 py-3"><div class="flex flex-wrap gap-2">${docMarkup}</div></td>
                             </tr>
                         `;
