@@ -18,9 +18,6 @@
             border: 1px solid rgba(148, 163, 184, 0.2);
             backdrop-filter: blur(10px);
         }
-        .hide {
-            display: none !important;
-        }
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -35,7 +32,7 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased">
-    <div id="login-screen" class="min-h-screen flex items-center justify-center px-4">
+    <section id="login-section" class="min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-md glass-panel rounded-2xl shadow-2xl p-8">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center h-16 w-16 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 mb-4">
@@ -47,35 +44,35 @@
 
             <form id="login-form" class="space-y-5" onsubmit="event.preventDefault(); return false;">
                 <div>
-                    <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Email</label>
+                    <label for="admin-email-input" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Email</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                             <i class="fa-solid fa-envelope"></i>
                         </span>
-                        <input id="email" type="email" required placeholder="admin@delrondispatch.com" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+                        <input id="admin-email-input" type="email" required placeholder="admin@delrondispatch.com" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
                     </div>
                 </div>
 
                 <div>
-                    <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Password</label>
+                    <label for="admin-password-input" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Password</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                             <i class="fa-solid fa-key"></i>
                         </span>
-                        <input id="password" type="password" required placeholder="Enter password" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+                        <input id="admin-password-input" type="password" required placeholder="Enter password" class="w-full rounded-xl border border-slate-700 bg-slate-900 pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
                     </div>
                 </div>
 
-                <div id="login-status" class="hidden rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200"></div>
+                <div id="login-error-message" class="hidden rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200"></div>
 
                 <button id="login-button" type="button" class="w-full rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 text-sm transition">
                     Sign In to Dashboard
                 </button>
             </form>
         </div>
-    </div>
+    </section>
 
-    <div id="dashboard-screen" class="hide min-h-screen">
+    <section id="dashboard-section" class="hidden min-h-screen">
         <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -85,9 +82,9 @@
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300">
                         <i class="fa-solid fa-user-shield text-amber-500"></i>
-                        <span id="active-user-email">Loading...</span>
+                        <span id="admin-email-display">Loading...</span>
                     </div>
-                    <button id="sign-out-button" class="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-amber-500 hover:text-amber-400 transition">
+                    <button id="signout-button" class="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-amber-500 hover:text-amber-400 transition">
                         <i class="fa-solid fa-right-from-bracket mr-2"></i>Sign Out
                     </button>
                 </div>
@@ -109,7 +106,7 @@
                         <span class="text-xs uppercase tracking-[0.2em] text-slate-400">Dry Van</span>
                         <i class="fa-solid fa-truck text-amber-500"></i>
                     </div>
-                    <div id="dry-van-count" class="text-3xl font-black text-white">0</div>
+                    <div id="dryvan-count" class="text-3xl font-black text-white">0</div>
                 </div>
 
                 <div class="glass-panel rounded-2xl p-5 shadow-lg">
@@ -169,49 +166,38 @@
                 </div>
             </section>
         </main>
-    </div>
+    </section>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const loginScreen = document.getElementById('login-screen');
-            const dashboardScreen = document.getElementById('dashboard-screen');
-            const loginForm = document.getElementById('login-form');
-            const loginStatus = document.getElementById('login-status');
+            const loginSection = document.getElementById('login-section');
+            const dashboardSection = document.getElementById('dashboard-section');
+            const loginErrorMessage = document.getElementById('login-error-message');
             const loginButton = document.getElementById('login-button');
-            const signOutButton = document.getElementById('sign-out-button');
-            const activeUserEmail = document.getElementById('active-user-email');
+            const signoutButton = document.getElementById('signout-button');
             const searchInput = document.getElementById('search-input');
             const tableBody = document.getElementById('carriers-table-body');
+            const adminEmailDisplay = document.getElementById('admin-email-display');
 
             const totalCarriersEl = document.getElementById('total-carriers');
-            const dryVanCountEl = document.getElementById('dry-van-count');
+            const dryvanCountEl = document.getElementById('dryvan-count');
             const reeferCountEl = document.getElementById('reefer-count');
             const flatbedCountEl = document.getElementById('flatbed-count');
 
             const supabase = window.supabase ? window.supabase.createClient(window.SUPABASE_URL, SUPABASE_ANON_KEY) : null;
             let allCarriers = [];
 
-            function setLoginStatus(message, isError = true) {
-                loginStatus.classList.remove('hidden');
-                loginStatus.classList.toggle('border-red-500/40', isError);
-                loginStatus.classList.toggle('bg-red-500/10', isError);
-                loginStatus.classList.toggle('text-red-200', isError);
-                loginStatus.textContent = message;
-            }
-
-            function clearLoginStatus() {
-                loginStatus.classList.add('hidden');
-                loginStatus.textContent = '';
-            }
-
-            function showDashboard() {
-                loginScreen.classList.add('hidden');
-                dashboardScreen.classList.remove('hidden');
+            function showDashboard(userEmail) {
+                document.getElementById('login-section')?.classList.add('hidden');
+                document.getElementById('dashboard-section')?.classList.remove('hidden');
+                const emailEl = document.getElementById('admin-email-display');
+                if (emailEl) emailEl.textContent = userEmail || '';
+                loadCarriers();
             }
 
             function showLogin() {
-                dashboardScreen.classList.add('hidden');
-                loginScreen.classList.remove('hidden');
+                document.getElementById('dashboard-section')?.classList.add('hidden');
+                document.getElementById('login-section')?.classList.remove('hidden');
             }
 
             function formatDate(value) {
@@ -221,221 +207,214 @@
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             }
 
-            function getEquipmentKey(value) {
-                if (!value) return 'other';
-                const normalized = value.toLowerCase();
-                if (normalized.includes('dry van')) return 'dry-van';
-                if (normalized.includes('reefer')) return 'reefer';
-                if (normalized.includes('flatbed')) return 'flatbed';
-                return 'other';
+            function setLoginError(message) {
+                if (!loginErrorMessage) return;
+                loginErrorMessage.textContent = message || '';
+                loginErrorMessage.classList.toggle('hidden', !message);
             }
 
             function renderMetrics(carriers) {
-                totalCarriersEl.textContent = carriers.length;
-                dryVanCountEl.textContent = carriers.filter((carrier) => getEquipmentKey(carrier.equipment_type) === 'dry-van').length;
-                reeferCountEl.textContent = carriers.filter((carrier) => getEquipmentKey(carrier.equipment_type) === 'reefer').length;
-                flatbedCountEl.textContent = carriers.filter((carrier) => getEquipmentKey(carrier.equipment_type) === 'flatbed').length;
-            }
+                const total = Array.isArray(carriers) ? carriers.length : 0;
+                const dryVan = Array.isArray(carriers) ? carriers.filter((c) => String(c.equipment_type || '').toLowerCase().includes('dry van')).length : 0;
+                const reefer = Array.isArray(carriers) ? carriers.filter((c) => String(c.equipment_type || '').toLowerCase().includes('reefer')).length : 0;
+                const flatbed = Array.isArray(carriers) ? carriers.filter((c) => String(c.equipment_type || '').toLowerCase().includes('flatbed')).length : 0;
 
-            function renderDocumentButtons(row) {
-                const docs = [
-                    { label: 'MC Authority', url: row.mc_authority_url, icon: 'fa-file-pdf' },
-                    { label: 'W-9', url: row.w9_url, icon: 'fa-file-invoice' },
-                    { label: 'Insurance COI', url: row.insurance_certificate_url, icon: 'fa-shield-halved' }
-                ];
-
-                return docs.map((doc) => {
-                    const isDisabled = !doc.url;
-                    return `
-                        <a
-                            href="${doc.url || '#'}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-bold ${isDisabled ? 'bg-slate-800 text-slate-500 cursor-not-allowed pointer-events-none' : 'bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20'}"
-                            title="${doc.label}"
-                            aria-label="Open ${doc.label}"
-                        >
-                            <i class="fa-solid ${doc.icon}"></i>
-                            ${doc.label}
-                        </a>
-                    `;
-                }).join('');
-            }
-
-            function filterCarriers() {
-                const query = searchInput.value.trim().toLowerCase();
-
-                if (!query) {
-                    renderRows(allCarriers);
-                    renderMetrics(allCarriers);
-                    return;
-                }
-
-                const filtered = allCarriers.filter((carrier) => {
-                    const searchable = [
-                        carrier.company_name,
-                        carrier.mc_dot_number,
-                        carrier.equipment_type,
-                        carrier.preferred_lanes,
-                        carrier.email,
-                        carrier.contact_name_phone
-                    ].join(' ').toLowerCase();
-
-                    return searchable.includes(query);
-                });
-
-                renderRows(filtered);
-                renderMetrics(filtered);
-            }
-
-            function renderRows(carriers) {
-                if (!carriers.length) {
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td colspan="9" class="px-4 py-10 text-center text-slate-400">
-                                No carrier submissions match your current search.
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                tableBody.innerHTML = carriers.map((carrier) => `
-                    <tr class="bg-slate-950/20 hover:bg-slate-900/60 transition">
-                        <td class="px-4 py-3 whitespace-nowrap text-slate-300">${formatDate(carrier.created_at)}</td>
-                        <td class="px-4 py-3 font-semibold text-white">${carrier.company_name || '—'}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.mc_dot_number || '—'}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.contact_name_phone || '—'}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.email || '—'}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.equipment_type || '—'}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-slate-300">${carrier.target_rate_per_mile || '—'}</td>
-                        <td class="px-4 py-3 max-w-xs text-slate-300">${carrier.preferred_lanes || '—'}</td>
-                        <td class="px-4 py-3">
-                            <div class="flex flex-wrap gap-2">
-                                ${renderDocumentButtons(carrier)}
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
+                if (totalCarriersEl) totalCarriersEl.textContent = String(total);
+                if (dryvanCountEl) dryvanCountEl.textContent = String(dryVan);
+                if (reeferCountEl) reeferCountEl.textContent = String(reefer);
+                if (flatbedCountEl) flatbedCountEl.textContent = String(flatbed);
             }
 
             async function loadCarriers() {
+                if (!tableBody) return;
+
                 if (!supabase) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="9" class="px-4 py-10 text-center text-red-300">
-                                Supabase client is unavailable. Check the configuration.
-                            </td>
+                            <td colspan="9" class="px-4 py-10 text-center text-red-300">Supabase client is unavailable.</td>
                         </tr>
                     `;
                     return;
                 }
 
-                const { data, error } = await supabase
-                    .from('carriers')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                try {
+                    const { data, error } = await supabase
+                        .from('carriers')
+                        .select('*')
+                        .order('created_at', { ascending: false });
 
-                if (error) {
+                    if (error) throw error;
+
+                    const carriers = Array.isArray(data) ? data : [];
+                    allCarriers = carriers;
+                    renderMetrics(carriers);
+
+                    tableBody.innerHTML = carriers.map((c) => {
+                        const companyName = c.company_name || 'N/A';
+                        const mcDot = c.mc_dot_number || 'N/A';
+                        const contact = c.contact_name_phone || 'N/A';
+                        const email = c.email || 'N/A';
+                        const equipment = c.equipment_type || 'N/A';
+                        const targetRate = c.target_rate_per_mile || 'N/A';
+                        const preferredLanes = c.preferred_lanes || 'N/A';
+
+                        const docs = [
+                            { label: 'MC Authority', url: c.mc_authority_url, icon: 'fa-file-pdf' },
+                            { label: 'W-9', url: c.w9_url, icon: 'fa-file-invoice' },
+                            { label: 'Insurance COI', url: c.insurance_certificate_url, icon: 'fa-shield-halved' }
+                        ];
+
+                        const docMarkup = docs.map((doc) => {
+                            if (!doc.url) {
+                                return `<span class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-[10px] font-bold text-slate-500">${doc.label}</span>`;
+                            }
+
+                            return `
+                                <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] font-bold text-amber-300 hover:bg-amber-500/20">
+                                    <i class="fa-solid ${doc.icon}"></i>${doc.label}
+                                </a>
+                            `;
+                        }).join('');
+
+                        return `
+                            <tr class="border-b border-slate-800">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${formatDate(c.created_at)}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-white font-semibold">${companyName}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${mcDot}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${contact}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${email}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${equipment}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${targetRate}</td>
+                                <td class="px-4 py-3 max-w-xs text-slate-300">${preferredLanes}</td>
+                                <td class="px-4 py-3"><div class="flex flex-wrap gap-2">${docMarkup}</div></td>
+                            </tr>
+                        `;
+                    }).join('');
+                } catch (error) {
+                    console.error('Failed to load carrier data:', error);
                     tableBody.innerHTML = `
                         <tr>
                             <td colspan="9" class="px-4 py-10 text-center text-red-300">
-                                Unable to load carrier submissions: ${error.message}
+                                Unable to load carriers. ${error?.message || 'Please try again.'}
                             </td>
                         </tr>
                     `;
-                    console.error('Failed to fetch carriers:', error);
-                    return;
                 }
-
-                allCarriers = data || [];
-                renderMetrics(allCarriers);
-                renderRows(allCarriers);
             }
 
-            async function checkSession() {
-                if (!supabase) {
-                    showLogin();
-                    return;
-                }
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    const query = searchInput.value.trim().toLowerCase();
+                    if (!query) {
+                        renderMetrics(allCarriers);
+                        loadCarriers();
+                        return;
+                    }
 
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session) {
-                    activeUserEmail.textContent = session.user?.email || 'Admin User';
-                    showDashboard();
-                    await loadCarriers();
-                    return;
-                }
+                    const filtered = allCarriers.filter((carrier) => {
+                        const searchable = [
+                            carrier.company_name,
+                            carrier.mc_dot_number,
+                            carrier.equipment_type,
+                            carrier.preferred_lanes,
+                            carrier.email,
+                            carrier.contact_name_phone
+                        ].join(' ').toLowerCase();
+                        return searchable.includes(query);
+                    });
 
-                showLogin();
+                    renderMetrics(filtered);
+                    tableBody.innerHTML = filtered.map((c) => {
+                        const docs = [
+                            { label: 'MC Authority', url: c.mc_authority_url, icon: 'fa-file-pdf' },
+                            { label: 'W-9', url: c.w9_url, icon: 'fa-file-invoice' },
+                            { label: 'Insurance COI', url: c.insurance_certificate_url, icon: 'fa-shield-halved' }
+                        ];
+
+                        const docMarkup = docs.map((doc) => {
+                            if (!doc.url) {
+                                return `<span class="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-2 py-1 text-[10px] font-bold text-slate-500">${doc.label}</span>`;
+                            }
+                            return `<a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] font-bold text-amber-300 hover:bg-amber-500/20"><i class="fa-solid ${doc.icon}"></i>${doc.label}</a>`;
+                        }).join('');
+
+                        return `
+                            <tr class="border-b border-slate-800">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${formatDate(c.created_at)}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-white font-semibold">${c.company_name || 'N/A'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.mc_dot_number || 'N/A'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.contact_name_phone || 'N/A'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.email || 'N/A'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.equipment_type || 'N/A'}</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-300">${c.target_rate_per_mile || 'N/A'}</td>
+                                <td class="px-4 py-3 max-w-xs text-slate-300">${c.preferred_lanes || 'N/A'}</td>
+                                <td class="px-4 py-3"><div class="flex flex-wrap gap-2">${docMarkup}</div></td>
+                            </tr>
+                        `;
+                    }).join('');
+                });
             }
 
-            async function handleLogin(event) {
+            loginButton?.addEventListener('click', async (event) => {
                 event.preventDefault();
 
                 if (!supabase) {
-                    setLoginStatus('Supabase is not configured correctly.');
+                    setLoginError('Supabase is not configured correctly.');
                     return;
                 }
 
-                const emailInput = document.getElementById('email');
-                const passwordInput = document.getElementById('password');
-                const email = emailInput.value.trim();
-                const password = passwordInput.value;
+                const email = document.getElementById('admin-email-input')?.value.trim();
+                const password = document.getElementById('admin-password-input')?.value;
 
                 if (!email || !password) {
-                    setLoginStatus('Please enter both your email and password.');
+                    setLoginError('Please enter both your email and password.');
                     return;
                 }
 
                 loginButton.disabled = true;
-                loginButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Signing In...';
-                clearLoginStatus();
+                loginButton.textContent = 'Signing In...';
+                setLoginError('');
 
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-                if (error) {
-                    setLoginStatus(error.message || 'Login failed. Please try again.');
+                try {
+                    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    if (data?.user) {
+                        showDashboard(data.user.email);
+                    }
+                } catch (error) {
+                    setLoginError(error?.message || 'Login failed. Please try again.');
+                } finally {
                     loginButton.disabled = false;
-                    loginButton.innerHTML = 'Sign In to Dashboard';
-                    return;
+                    loginButton.textContent = 'Sign In to Dashboard';
                 }
+            });
 
-                if (data.session) {
-                    activeUserEmail.textContent = data.session.user?.email || email;
-                    loginScreen.classList.add('hidden');
-                    dashboardScreen.classList.remove('hidden');
-                    await loadCarriers();
-                }
-
-                loginButton.disabled = false;
-                loginButton.innerHTML = 'Sign In to Dashboard';
-                loginForm.reset();
-            }
-
-            async function handleSignOut() {
+            signoutButton?.addEventListener('click', async () => {
                 if (!supabase) {
-                    showLogin();
+                    if (dashboardSection) dashboardSection.classList.add('hidden');
+                    if (loginSection) loginSection.classList.remove('hidden');
                     return;
                 }
 
-                const { error } = await supabase.auth.signOut();
-                if (error) {
-                    console.error('Sign out failed:', error);
+                await supabase.auth.signOut();
+                if (dashboardSection) dashboardSection.classList.add('hidden');
+                if (loginSection) loginSection.classList.remove('hidden');
+                if (adminEmailDisplay) adminEmailDisplay.textContent = 'Loading...';
+                setLoginError('');
+            });
+
+            if (supabase) {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.user) {
+                    showDashboard(session.user.email);
+                } else {
+                    showLogin();
                 }
-
+            } else {
                 showLogin();
-                clearLoginStatus();
-                loginForm.reset();
-                activeUserEmail.textContent = 'Loading...';
             }
-
-            loginButton.addEventListener('click', handleLogin);
-            signOutButton.addEventListener('click', handleSignOut);
-            searchInput.addEventListener('input', filterCarriers);
-
-            await checkSession();
         });
     </script>
 </body>
 </html>
+
