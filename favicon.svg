@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Delron Dispatch favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0d1f32"/>
+      <stop offset="100%" stop-color="#132b40"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="20" fill="url(#bg)"/>
+
+  <!-- Large D monogram -->
+  <path d="M156 84h114c89 0 162 63 162 170s-73 170-162 170H156V84zm68 68v204h46c51 0 92-34 92-102s-41-102-92-102h-46z" fill="#F5A623"/>
+
+  <!-- Road / route line -->
+  <path d="M119 267c64-69 115-107 173-107 46 0 81 16 110 42l-22 34c-26-21-52-31-86-31-45 0-85 28-139 87l-36-25z" fill="#1b2b3d" opacity="0.9"/>
+
+  <!-- Truck silhouette -->
+  <g transform="translate(132 168)">
+    <path d="M44 92h132l24 40h40c18 0 32 14 32 32v12c0 18-14 32-32 32H44c-18 0-32-14-32-32v-12c0-18 14-32 32-32h20V92zm47 0V56h86v36H91zm-27 36h30v34H64v-34zm154 0h26v34h-26v-34z" fill="#F5A623"/>
+    <rect x="96" y="72" width="76" height="40" rx="5" fill="#0d1f32" opacity="0.9"/>
+    <circle cx="74" cy="178" r="18" fill="#0d1f32"/>
+    <circle cx="186" cy="178" r="18" fill="#0d1f32"/>
+    <circle cx="74" cy="178" r="8" fill="#F5A623"/>
+    <circle cx="186" cy="178" r="8" fill="#F5A623"/>
+  </g>
+
+  <!-- Arrow accent -->
+  <path d="M238 250l72-12 18 16-69 14 29 63-31 6-26-87 7-0z" fill="#F5A623"/>
+</svg>
