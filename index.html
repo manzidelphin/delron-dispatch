@@ -414,6 +414,17 @@
                         throw new Error(insertError.message || 'Failed to save your carrier profile.');
                     }
 
+                    const { error: notificationError } = await supabaseClient.functions.invoke('send-onboarding-email', {
+                        body: {
+                            carrier: payload
+                        }
+                    });
+
+                    if (notificationError) {
+                        console.error('Onboarding email notification failed:', notificationError);
+                        throw new Error('Your carrier packet was saved, but the email notification could not be sent.');
+                    }
+
                     console.log('Carrier inserted successfully:', data);
                     setStatus('success', 'Carrier packet submitted successfully. Redirecting to thank-you page...');
                     form.reset();
