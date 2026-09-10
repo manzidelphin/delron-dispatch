@@ -414,14 +414,25 @@
                         throw new Error(insertError.message || 'Failed to save your carrier profile.');
                     }
 
-                    const { error: notificationError } = await supabaseClient.functions.invoke('send-onboarding-email', {
-                        body: {
-                            carrier: payload
-                        }
+                    const notificationResponse = await fetch('https://jflntnlfbvhybggrmbqd.supabase.co/functions/v1/send-onboarding-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${supabaseAnonKey}`
+                        },
+                        body: JSON.stringify({
+                            companyName: payload.company_name,
+                            mcNumber: payload.mc_dot_number,
+                            email: payload.email,
+                            phone: payload.contact_name_phone,
+                            insuranceUrl: payload.insurance_certificate_url,
+                            w9Url: payload.w9_url
+                        })
                     });
 
-                    if (notificationError) {
-                        console.error('Onboarding email notification failed:', notificationError);
+                    if (!notificationResponse.ok) {
+                        const notificationError = await notificationResponse.text();
+                        console.error('Onboarding email notification failed:', notificationResponse.status, notificationError);
                         throw new Error('Your carrier packet was saved, but the email notification could not be sent.');
                     }
 
